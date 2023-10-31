@@ -31,3 +31,7 @@ const filtrarAutenticacao = async (req, res, next) => {
         return res.status(500).json({ mensagem: `Erro interno: ${error.message}` });
     }
 }
+
+module.exports = {
+    filtrarAutenticacao
+}

@@ -37,6 +37,14 @@ const cadastrarUsuario = async (req, res) => {
     }
 }
 
+//verificar no video se ele importou o intermediario pra cá.
+
+const detalharUsuario = async (req, res) => {
+    return res.status(200).json(req.usuario);
+}
+
+
 module.exports = {
-    cadastrarUsuario
+    cadastrarUsuario,
+    detalharUsuario
 }
