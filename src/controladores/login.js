@@ -1,4 +1,4 @@
-const { query } = require('../bancodedados/conexao');
+
 const bcrypt = require('bcrypt');
 const { query } = require('../bancodedados/conexao');
 const jwt = require('jsonwebtoken');

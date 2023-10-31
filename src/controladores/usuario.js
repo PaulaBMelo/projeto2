@@ -33,7 +33,7 @@ const cadastrarUsuario = async (req, res) => {
         return res.status(201).json(cadastro);
 
     } catch (error) {
-        return res.status(500).json({ mensagem: `Erro: ${error.mensage}` });
+        return res.status(500).json({ mensagem: `Erro: ${error}` });
     }
 }
 
