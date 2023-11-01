@@ -1,6 +1,6 @@
 const query = require("../bancodedados/conexao");
 
-const listarTransacoes = async (req, res) => {
+const detalharTransacoes = async (req, res) => {
     const { usuario } = req;
     try {
         const transacoesEncontradas = await query('select * from transacoes where id = $1', [usuario.id]);
@@ -135,10 +135,64 @@ const excluirTransacao = async (req, res) => {
 
 }
 
+const obterExtrato = async (req, res) => {
+    const { usuario } = req;
+
+    try {
+        const queryExtrato = 'select sum(valor) as saldo from transacoes where usuario_id = $1 and tipo = $2';
+        const saldoEntrada = await query(queryExtrato, [usuario.id, 'entrada']);
+        const saldoSaida = await query(queryExtrato, [usuario.id, 'saida']);
+
+        return res.json({
+            entrada: Number(saldoEntrada.rows[0].saldo) ?? 0,
+            saida: Number(saldoSaida.rows[0].saldo) ?? 0
+        });
+
+    } catch (error) {
+        return res.status(500).json({ mensagem: `Erro interno: ${error.message}` });
+    }
+}
+
+const listarTransacoes = async (req, res) => {
+    const { usuario } = req;
+    const { filtro } = req.query;
+
+    if (filtro && !Array.isArray(filtro)) {
+        return res.status(400).json({ mensagem: 'O filtro precisa ser um array' });
+    }
+
+    try {
+        let queryLike = '';
+        let arrayFiltro;
+
+        if (filtro) {
+            arrayFiltro = filtro.map((item) => `%${item}%`);
+            queryLike += `and c.descricao ilike any($2)`;
+        }
+
+        const queryTransacoes = `
+            select t.*, c.descricao as categoria_nome from transacoes t 
+            left join categorias c 
+            on t.categoria_id = c.id 
+            where t.usuario_id = $1 
+            ${queryLike}
+        `;
+
+        const paramFiltro = filtro ? [usuario.id, arrayFiltro] : [usuario.id];
+
+        const transacoes = await query(queryTransacoes, paramFiltro);
+        return res.json(transacoes.rows);
+    } catch (error) {
+        return res.status(500).json({ mensagem: `Erro interno: ${error.message}` });
+    }
+}
+
 module.exports = {
-    listarTransacoes,
+    detalharTransacoes,
     detalharTransacao,
     cadastrarTransacao,
     atualizarTransacao,
-    excluirTransacao
+    excluirTransacao,
+    obterExtrato,
+    listarTransacoes
 }
