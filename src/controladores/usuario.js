@@ -1,8 +1,6 @@
 const { query } = require('../bancodedados/conexao');
 const bcrypt = require('bcrypt');
 
-//SyntaxError: Unexpected token } in JSON at position 45
-
 const cadastrarUsuario = async (req, res) => {
     const { nome, email, senha } = req.body;
 
